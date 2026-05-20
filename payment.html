@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Payment | CarePlus</title>
+<style>
+*{
+box-sizing:border-box;
+margin:0;padding:0
+}
+body{font-family:'Poppins',sans-serif;
+background:linear-gradient(135deg,#eef2ff,#dbeafe)
+;display:flex;justify-content:center;
+align-items:flex-start;
+min-height:100vh;
+padding:30px 16px
+}
+.card{background:#fff;
+padding:26px;
+border-radius:18px;
+width:100%;
+max-width:430px;
+box-shadow:0 15px 40px rgba(0,0,0,0.1)
+}
+h2{text-align:center;
+color:#1e3a8a;
+font-size:20px;
+margin-bottom:4px
+}
+.subtitle{text-align:center;
+color:#64748b;
+font-size:13px;
+margin-bottom:18px
+}
+.fee-box{background:#eff6ff;
+border:1px solid #bfdbfe;
+border-radius:12px;
+padding:14px;
+text-align:center;
+margin-bottom:16px
+}
+.fee-label
+{
+font-size:12px;
+color:#64748b
+}
+.fee-amount
+{
+font-size:34px;
+font-weight:700;
+color:#1d4ed8
+}
+.fee-note
+{
+font-size:11px;
+color:#94a3b8;
+margin-top:3px
+}
+.summary
+{
+background:#f8fafc;
+border-radius:10px;
+padding:12px;
+margin-bottom:16px
+}
+.srow
+{
+display:flex;
+justify-content:space-between;
+padding:5px 0;
+font-size:13px;
+border-bottom:1px solid #e2e8f0
+}
+.srow:last-child{border:none}
+.lbl{color:#64748b}
+.val{font-weight:600;color:#1e293b}
+.method-tabs{display:flex;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:18px}
+.mtab{flex:1;padding:11px 6px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;background:#f8fafc;color:#64748b;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all 0.2s}
+.mtab .mi{font-size:20px}
+.mtab.active{background:#1d4ed8;color:#fff}
+.mtab:not(:last-child){border-right:1px solid #e2e8f0}
+.panel{display:none}
+.panel.active{display:block}
+.card-logos{display:flex;gap:6px;margin-bottom:12px}
+.clogo{padding:4px 10px;border-radius:6px;border:1px solid #e2e8f0;font-size:11px;font-weight:700;background:#f8fafc;color:#475569}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:#64748b;margin-bottom:4px}
+.field input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;color:#1e293b;background:#fff}
+.field input:focus{border-color:#3b82f6;outline:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qr-wrap{text-align:center;padding:8px 0}
+.qr-apps{display:flex;justify-content:center;gap:16px;margin-bottom:12px}
+.qr-app{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#475569;font-weight:600}
+.qr-app-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.qr-box{display:inline-block;background:#fff;border:2px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:12px}
+.upi-id-box{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.upi-id-txt{font-size:13px;font-weight:600;color:#166534}
+.copy-btn{padding:5px 12px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-weight:600}
+.upi-apps-row{display:flex;gap:8px;margin-bottom:14px}
+.upi-chip{flex:1;padding:10px 6px;border-radius:10px;border:1px solid #e2e8f0;text-align:center;cursor:pointer;font-size:11px;font-weight:600;background:#f8fafc;color:#475569;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.upi-chip.sel{border-color:#3b82f6;background:#eff6ff;color:#1d4ed8}
+.upi-chip .ai{font-size:22px}
+.verify-row{display:flex;gap:8px;margin-bottom:10px}
+.verify-row input{flex:1;padding:11px 12px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;color:#1e293b}
+.verify-row button{padding:11px 14px;border-radius:10px;border:none;background:#3b82f6;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.verified{display:none;background:#dcfce7;color:#166534;font-size:12px;font-weight:600;padding:8px 12px;border-radius:8px;margin-bottom:10px;text-align:center}
+.pay-btn{width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;font-size:15px;font-weight:700;margin-top:6px}
+.pay-btn.blue{background:#1d4ed8;color:#fff}
+.pay-btn.green{background:#16a34a;color:#fff}
+.pay-btn:disabled{background:#94a3b8;cursor:not-allowed}
+.secure{text-align:center;font-size:11px;color:#94a3b8;margin-top:10px}
+.overlay-bg{display:none;min-height:0}
+.overlay-bg.show{display:flex;min-height:420px;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;border-radius:18px;margin-top:16px;width:100%;max-width:430px}
+.notif-box{background:#fff;border-radius:16px;padding:28px 24px;text-align:center;width:300px;animation:pop 0.3s ease}
+@keyframes pop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+.chk{width:62px;height:62px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px;color:#16a34a}
+.nt{font-size:18px;font-weight:700;color:#166534;margin-bottom:6px}
+.ns{font-size:13px;color:#4ade80;margin-bottom:8px}
+.nd{font-size:13px;color:#475569;margin-bottom:4px}
+.np{color:#16a34a;font-weight:700;font-size:15px;margin:10px 0 16px}
+.vbtn{padding:11px 28px;background:#3b82f6;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+  <h2>&#128179; Payment</h2>
+  <p class="subtitle">Secure appointment fee payment</p>
+
+  <div class="fee-box">
+    <div class="fee-label">Appointment Consultation Fee</div>
+    <div class="fee-amount">&#8377;100</div>
+    <div class="fee-note">One-time payment &bull; Non-refundable</div>
+  </div>
+
+  <div class="summary">
+    <div class="srow"><span class="lbl">Doctor</span><span class="val" id="s-doc">&#8212;</span></div>
+    <div class="srow"><span class="lbl">Date</span><span class="val" id="s-date">&#8212;</span></div>
+    <div class="srow"><span class="lbl">Time</span><span class="val" id="s-time">&#8212;</span></div>
+    <div class="srow"><span class="lbl">Patient</span><span class="val" id="s-name">&#8212;</span></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="method-tabs">
+    <button class="mtab active" onclick="switchTab('card',this)">
+      <span class="mi">&#128179;</span>Card
+    </button>
+    <button class="mtab" onclick="switchTab('qr',this)">
+      <span class="mi">&#9638;</span>Scan QR
+    </button>
+    <button class="mtab" onclick="switchTab('upi',this)">
+      <span class="mi">&#128241;</span>UPI ID
+    </button>
+  </div>
+
+  <!-- CARD PANEL -->
+  <div class="panel active" id="panel-card">
+    <div class="card-logos">
+      <span class="clogo">VISA</span><span class="clogo">MC</span>
+      <span class="clogo">RuPay</span><span class="clogo">AMEX</span>
+    </div>
+    <div class="field">
+      <label>Card Number</label>
+      <input type="text" id="cardNum" placeholder="0000  0000  0000  0000" maxlength="19" oninput="fmtCard(this)">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Expiry (MM / YY)</label>
+        <input type="text" id="expiry" placeholder="MM / YY" maxlength="7" oninput="fmtExp(this)">
+      </div>
+      <div class="field">
+        <label>CVV</label>
+        <input type="password" id="cvv" placeholder="&#9679;&#9679;&#9679;" maxlength="3">
+      </div>
+    </div>
+    <div class="field">
+      <label>Name on Card</label>
+      <input type="text" id="cardName" placeholder="e.g. Rahul Sharma">
+    </div>
+    <button class="pay-btn blue" onclick="doPayment('card')">&#128274; Pay &#8377;100 with Card</button>
+  </div>
+
+  <!-- QR PANEL -->
+  <div class="panel" id="panel-qr">
+    <div class="qr-wrap">
+      <div class="qr-apps">
+        <div class="qr-app">
+          <div class="qr-app-icon" style="background:#5f259f;color:white">&#128241;</div>
+          <span>PhonePe</span>
+        </div>
+        <div class="qr-app">
+          <div class="qr-app-icon" style="background:#ffffff;border:1px solid #e2e8f0">
+            <svg width="28" height="28" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#4285F4"/><text x="24" y="31" text-anchor="middle" font-size="20" font-weight="bold" fill="white">G</text></svg>
+          </div>
+          <span>GPay</span>
+        </div>
+        <div class="qr-app">
+          <div class="qr-app-icon" style="background:#00BAF2;color:white;font-size:18px;font-weight:700">Pay</div>
+          <span>Paytm</span>
+        </div>
+        <div class="qr-app">
+          <div class="qr-app-icon" style="background:#ff6600;color:white">&#9654;</div>
+          <span>BHIM</span>
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:#64748b;margin-bottom:12px">Open App &#8594;Scan QR Code &#8594; &#8377;100 Pay</p>
+
+      <div class="qr-box">
+        <svg width="164" height="164" viewBox="0 0 164 164" xmlns="http://www.w3.org/2000/svg">
+          <rect width="164" height="164" fill="white"/>
+          <rect x="10" y="10" width="42" height="42" rx="5" fill="#1e3a8a"/>
+          <rect x="17" y="17" width="28" height="28" rx="3" fill="white"/>
+          <rect x="22" y="22" width="18" height="18" rx="2" fill="#1e3a8a"/>
+          <rect x="112" y="10" width="42" height="42" rx="5" fill="#1e3a8a"/>
+          <rect x="119" y="17" width="28" height="28" rx="3" fill="white"/>
+          <rect x="124" y="22" width="18" height="18" rx="2" fill="#1e3a8a"/>
+          <rect x="10" y="112" width="42" height="42" rx="5" fill="#1e3a8a"/>
+          <rect x="17" y="119" width="28" height="28" rx="3" fill="white"/>
+          <rect x="22" y="124" width="18" height="18" rx="2" fill="#1e3a8a"/>
+          <rect x="62" y="10" width="6" height="6" fill="#1e3a8a"/><rect x="72" y="10" width="6" height="6" fill="#1e3a8a"/><rect x="82" y="10" width="6" height="6" fill="#1e3a8a"/><rect x="96" y="10" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="20" width="6" height="6" fill="#1e3a8a"/><rect x="82" y="20" width="6" height="6" fill="#1e3a8a"/><rect x="92" y="20" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="30" width="6" height="6" fill="#1e3a8a"/><rect x="72" y="30" width="6" height="6" fill="#1e3a8a"/><rect x="92" y="30" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="40" width="6" height="6" fill="#1e3a8a"/><rect x="102" y="40" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="10" y="62" width="6" height="6" fill="#1e3a8a"/><rect x="22" y="62" width="6" height="6" fill="#1e3a8a"/><rect x="42" y="62" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="62" width="6" height="6" fill="#1e3a8a"/><rect x="82" y="62" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="102" y="62" width="6" height="6" fill="#1e3a8a"/><rect x="122" y="62" width="6" height="6" fill="#1e3a8a"/><rect x="142" y="62" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="10" y="72" width="6" height="6" fill="#1e3a8a"/><rect x="32" y="72" width="6" height="6" fill="#1e3a8a"/><rect x="52" y="72" width="6" height="6" fill="#1e3a8a"/><rect x="72" y="72" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="92" y="72" width="6" height="6" fill="#1e3a8a"/><rect x="112" y="72" width="6" height="6" fill="#1e3a8a"/><rect x="132" y="72" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="22" y="82" width="6" height="6" fill="#1e3a8a"/><rect x="42" y="82" width="6" height="6" fill="#1e3a8a"/><rect x="62" y="82" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="82" y="82" width="6" height="6" fill="#1e3a8a"/><rect x="102" y="82" width="6" height="6" fill="#1e3a8a"/><rect x="122" y="82" width="6" height="6" fill="#1e3a8a"/><rect x="142" y="82" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="10" y="92" width="6" height="6" fill="#1e3a8a"/><rect x="32" y="92" width="6" height="6" fill="#1e3a8a"/><rect x="72" y="92" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="92" y="92" width="6" height="6" fill="#1e3a8a"/><rect x="112" y="92" width="6" height="6" fill="#1e3a8a"/><rect x="132" y="92" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="10" y="102" width="6" height="6" fill="#1e3a8a"/><rect x="22" y="102" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="52" y="102" width="6" height="6" fill="#1e3a8a"/><rect x="82" y="102" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="112" width="6" height="6" fill="#1e3a8a"/><rect x="82" y="112" width="6" height="6" fill="#1e3a8a"/><rect x="102" y="112" width="6" height="6" fill="#1e3a8a"/><rect x="122" y="112" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="122" width="6" height="6" fill="#1e3a8a"/><rect x="72" y="122" width="6" height="6" fill="#1e3a8a"/><rect x="92" y="122" width="6" height="6" fill="#1e3a8a"/><rect x="132" y="122" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="132" width="6" height="6" fill="#1e3a8a"/><rect x="82" y="132" width="6" height="6" fill="#1e3a8a"/><rect x="102" y="132" width="6" height="6" fill="#1e3a8a"/><rect x="112" y="132" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="62" y="142" width="6" height="6" fill="#1e3a8a"/><rect x="72" y="142" width="6" height="6" fill="#1e3a8a"/><rect x="92" y="142" width="6" height="6" fill="#1e3a8a"/><rect x="142" y="142" width="6" height="6" fill="#1e3a8a"/>
+          <rect x="69" y="69" width="26" height="26" rx="4" fill="white"/>
+          <rect x="71" y="71" width="22" height="22" rx="3" fill="#3b82f6"/>
+          <text x="82" y="87" text-anchor="middle" font-size="13" font-weight="bold" fill="white">C+</text>
+        </svg>
+      </div>
+
+      <div class="upi-id-box">
+        <span class="upi-id-txt">careplus@upi</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyUPI()">Copy</button>
+      </div>
+      <p style="font-size:11px;color:#94a3b8;margin-bottom:14px">Amount: <strong style="color:#1d4ed8">&#8377;100</strong> &bull; Go TO BOOKING PAGE</p>
+      <button class="pay-btn green" onclick="doPayment('qr')">&#10003; Confirm For Payment </button>
+    </div>
+  </div>
+
+  <!-- UPI ID PANEL -->
+  <div class="panel" id="panel-upi">
+    <p style="font-size:13px;color:#64748b;margin-bottom:10px">Select APP:</p>
+    <div class="upi-apps-row">
+      <div class="upi-chip" onclick="selApp(this)">
+        <span class="ai" style="color:#5f259f">&#128241;</span>PhonePe
+      </div>
+      <div class="upi-chip" onclick="selApp(this)">
+        <span class="ai">
+          <svg width="22" height="22" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#4285F4"/><text x="24" y="31" text-anchor="middle" font-size="20" font-weight="bold" fill="white">G</text></svg>
+        </span>GPay
+      </div>
+      <div class="upi-chip" onclick="selApp(this)">
+        <span class="ai" style="color:#00BAF2;font-size:14px;font-weight:700">Pay</span>Paytm
+      </div>
+      <div class="upi-chip" onclick="selApp(this)">
+        <span class="ai" style="color:#ff6600">&#9654;</span>BHIM
+      </div>
+    </div>
+    <div class="field">
+      <label>Your UPI ID</label>
+      <div class="verify-row">
+        <input type="text" id="upiId" placeholder="9876543210@ybl  or  name@okaxis">
+        <button onclick="verifyUPI()">Verify</button>
+      </div>
+    </div>
+    <div class="verified" id="verifiedBadge">&#10003; UPI ID verified!</div>
+    <button class="pay-btn green" id="upiPayBtn" onclick="doPayment('upi')" disabled>&#128274; Pay &#8377;100 via UPI</button>
+  </div>
+
+  <p class="secure">&#128274; 256-bit SSL secured &bull; PCI DSS compliant</p>
+</div>
+
+<!-- Success overlay -->
+<div class="overlay-bg" id="successOverlay">
+  <div class="notif-box">
+    <div class="chk">&#10003;</div>
+    <div class="nt">Booking Confirmed!</div>
+    <div class="ns">Appointment successfully booked</div>
+    <div class="nd" id="n-doctor"></div>
+    <div class="nd" id="n-dt"></div>
+    <div class="np">&#8377;100 payment successful</div>
+    <button class="vbtn" onclick="goHistory()">Go to Doctor Page &#8594;</button>
+  </div>
+</div>
+
+<script>
+var pending=null,pending2=null;
+try{pending=JSON.parse(sessionStorage.getItem("pendingBooking"));}catch(e){}
+if(pending){
+  document.getElementById("s-doc").innerText=pending.doctor||"—";
+  document.getElementById("s-date").innerText=pending.date||"—";
+  document.getElementById("s-time").innerText=pending.time||"—";
+  document.getElementById("s-name").innerText=pending.name||"—";
+  document.getElementById("n-doctor").innerText="Doctor: "+pending.doctor;
+  document.getElementById("n-dt").innerText=pending.date+" • "+pending.time;
+}
+
+function switchTab(id,el){
+  document.querySelectorAll(".mtab").forEach(function(t){t.classList.remove("active");});
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
+  el.classList.add("active");
+  document.getElementById("panel-"+id).classList.add("active");
+}
+
+function fmtCard(inp){
+  var v=inp.value.replace(/\D/g,"").substring(0,16);
+  var out=[];
+  for(var i=0;i<v.length;i+=4)out.push(v.substring(i,i+4));
+  inp.value=out.join("  ");
+}
+
+function fmtExp(inp){
+  var v=inp.value.replace(/\D/g,"").substring(0,4);
+  if(v.length>=3)v=v.substring(0,2)+" / "+v.substring(2);
+  inp.value=v;
+}
+
+function copyUPI(){
+  navigator.clipboard.writeText("careplus@upi").catch(function(){});
+  var b=document.getElementById("copyBtn");
+  b.innerText="Copied!";
+  setTimeout(function(){b.innerText="Copy";},2000);
+}
+
+function selApp(el){
+  document.querySelectorAll(".upi-chip").forEach(function(c){c.classList.remove("sel");});
+  el.classList.add("sel");
+}
+
+function verifyUPI(){
+  var id=document.getElementById("upiId").value.trim();
+  if(!id||id.indexOf("@")===-1){alert("Enter Valid UPI ID (example: 9876543210@ybl)");return;}
+  var badge=document.getElementById("verifiedBadge");
+  badge.style.display="block";
+  badge.innerText="✓ UPI ID verified — "+(pending?pending.name:"User");
+  var btn=document.getElementById("upiPayBtn");
+  btn.disabled=false;
+  btn.innerText="🔒 Pay ₹100 via UPI";
+}
+
+function doPayment(method){
+  if(method==="card"){
+    var num=document.getElementById("cardNum").value.replace(/\s/g,"");
+    var exp=document.getElementById("expiry").value;
+    var cvv=document.getElementById("cvv").value;
+    var nm=document.getElementById("cardName").value.trim();
+    if(num.length<16||!exp||cvv.length<3||!nm){alert("⚠️ Fill All Card details");return;}
+  }
+  if(method==="upi"){
+    var uid=document.getElementById("upiId").value.trim();
+    if(!uid||uid.indexOf("@")===-1){alert("⚠️ Valid UPI ID verify ");return;}
+  }
+  var btn=event.target;
+  btn.disabled=true;
+  var orig=btn.innerText;
+  btn.innerText="Processing...";
+  setTimeout(function(){confirmBooking();},1500);
+}
+
+function confirmBooking(){
+  if(!pending)return;
+  var key=pending.doctor+"_"+pending.date+"_"+pending.time;
+  var booked=JSON.parse(localStorage.getItem("bookedSlots"))||[];
+  if(!booked.includes(key)){booked.push(key);localStorage.setItem("bookedSlots",JSON.stringify(booked));}
+  var apps=JSON.parse(localStorage.getItem("appointments"))||[];
+  apps.push({name:pending.name,email:pending.email,mobile:pending.mobile,doctor:pending.doctor,date:pending.date,time:pending.time,status:"Confirmed",paid:true,amount:100});
+  localStorage.setItem("appointments",JSON.stringify(apps));
+  pending2=pending;
+  sessionStorage.removeItem("pendingBooking");
+  document.getElementById("mainCard").style.display="none";
+  document.getElementById("successOverlay").classList.add("show");
+}
+
+function goHistory(){
+  var doc=pending2 ? pending2.doctor : "";
+  window.location.href="doctors.jsp?doctor="+encodeURIComponent(doc);
+}
+</script>
+</body>
+</html>
